@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">GSTodos</string>
+    <string name="action_settings">Settings</string>
+    <string-array name="priorities">
+        <item>None</item>
+        <item>Low</item>
+        <item>Medium</item>
+        <item>High</item>
+    </string-array>
+    <string name="title_activity_temp">temp</string>
+</resources>

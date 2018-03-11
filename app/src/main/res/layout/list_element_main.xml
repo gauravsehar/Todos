@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:descendantFocusability="blocksDescendants"
+    android:orientation="horizontal">
+
+    <RadioButton
+        android:id="@+id/todoDoneRadioButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/contentLinearLayout"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true" />
+
+    <LinearLayout
+        android:id="@+id/contentLinearLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentTop="true"
+        android:layout_toEndOf="@id/todoDoneRadioButton"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/todoNameTextView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:maxLines="3"
+            android:padding="2dp"
+            android:paddingTop="2dp"
+            android:text="s"
+            android:textColor="@android:color/black" />
+
+        <GridLayout
+            android:id="@+id/todoIconsGridLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:columnCount="3"
+            android:paddingBottom="1dp"
+            android:paddingTop="1dp"
+            android:rowCount="1">
+
+            <ImageView
+                android:id="@+id/todoAlarmImageView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_column="0"
+                android:layout_row="0"
+                android:adjustViewBounds="true"
+                android:contentDescription="Alarms"
+                android:maxHeight="20dp"
+                android:maxWidth="20dp"
+                android:padding="5dp"
+                android:scaleType="fitCenter"
+                app:srcCompat="@drawable/ic_access_alarm_black_24dp" />
+
+            <ImageView
+                android:id="@+id/todoCommentImageView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_column="1"
+                android:layout_row="0"
+                android:adjustViewBounds="true"
+                android:contentDescription="Comments"
+                android:maxHeight="20dp"
+                android:maxWidth="20dp"
+                android:padding="5dp"
+                android:scaleType="fitCenter"
+                app:srcCompat="@drawable/ic_speaker_notes_black_24dp" />
+
+            <ImageView
+                android:id="@+id/todoTagImageView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_column="2"
+                android:layout_row="0"
+                android:adjustViewBounds="true"
+                android:contentDescription="Tags"
+                android:maxHeight="20dp"
+                android:maxWidth="20dp"
+                android:padding="5dp"
+                android:scaleType="fitCenter"
+                android:tint="@color/colorAccent"
+                app:srcCompat="@drawable/tag_icon" />
+        </GridLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="end"
+            android:orientation="horizontal"
+            android:paddingBottom="2dp"
+            android:paddingEnd="5dp"
+            android:paddingTop="1dp">
+
+            <TextView
+                android:id="@+id/tag5TextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="2dp"
+                android:background="@drawable/background_white"
+                android:backgroundTint="@color/colorPrimary"
+                android:ellipsize="end"
+                android:fontFamily="monospace"
+                android:maxLength="10"
+                android:maxLines="1"
+                android:paddingEnd="2dp"
+                android:paddingStart="2dp"
+                android:text="Tag5"
+                android:textSize="10sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tag4TextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="2dp"
+                android:background="@drawable/background_white"
+                android:backgroundTint="@color/colorPrimary"
+                android:ellipsize="end"
+                android:fontFamily="monospace"
+                android:maxLines="1"
+                android:paddingEnd="2dp"
+                android:paddingStart="2dp"
+                android:text="Tag4"
+                android:textSize="10sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tag3TextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="2dp"
+                android:background="@drawable/background_white"
+                android:backgroundTint="@color/colorPrimary"
+                android:ellipsize="end"
+                android:fontFamily="monospace"
+                android:maxLines="1"
+                android:paddingEnd="2dp"
+                android:paddingStart="2dp"
+                android:text="Tag3"
+                android:textSize="10sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tag2TextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="2dp"
+                android:background="@drawable/background_white"
+                android:backgroundTint="@color/colorPrimary"
+                android:ellipsize="end"
+                android:fontFamily="monospace"
+                android:maxLines="1"
+                android:paddingEnd="2dp"
+                android:paddingStart="2dp"
+                android:text="Tag2"
+                android:textSize="10sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tag1TextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="2dp"
+                android:background="@drawable/background_white"
+                android:backgroundTint="@color/colorPrimary"
+                android:ellipsize="end"
+                android:fontFamily="monospace"
+                android:maxLines="1"
+                android:paddingEnd="2dp"
+                android:paddingStart="2dp"
+                android:text="Tag1"
+                android:textSize="10sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/moreTagsTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="2dp"
+                android:background="@drawable/background_white"
+                android:backgroundTint="@color/colorPrimary"
+                android:ellipsize="end"
+                android:fontFamily="monospace"
+                android:maxLines="1"
+                android:maxWidth="30dp"
+                android:paddingEnd="2dp"
+                android:paddingStart="2dp"
+                android:text="..."
+                android:textSize="10sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </LinearLayout>
+
+
+</RelativeLayout>

@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="com.example.gauravsehar.gstodos.MainActivity"
+    tools:showIn="@layout/activity_main">
+
+    <ListView
+        android:id="@+id/todoListView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/doneTodoRadioButton"
+        android:layout_alignParentStart="true"
+        android:scrollbars="vertical" />
+
+    <RadioButton
+        android:id="@+id/doneTodoRadioButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/todoNameEditText"
+        android:layout_alignParentStart="true"
+        android:layout_alignTop="@+id/todoNameEditText"
+        android:background="@drawable/background_white" />
+
+    <EditText
+        android:id="@+id/todoNameEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignTop="@+id/addTodoButton"
+        android:layout_toEndOf="@+id/doneTodoRadioButton"
+        android:layout_toStartOf="@+id/addTodoButton"
+        android:background="@drawable/background_white"
+        android:ems="10"
+        android:hint="Add Your Todo"
+        android:inputType="textMultiLine"
+        android:maxLines="3"
+        android:paddingTop="2dp" />
+
+    <Button
+        android:id="@+id/addTodoButton"
+        style="@style/Widget.AppCompat.Button.ButtonBar.AlertDialog"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:background="@drawable/background_white"
+        android:text="ADD" />
+
+</RelativeLayout>
