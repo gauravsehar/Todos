@@ -24,28 +24,32 @@ public class TodoOpenHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String expensesSql = "CREATE TABLE " + Contract.Todo.TABLE_NAME + " ( " +
+        String command = "CREATE TABLE " + Contract.Todo.TABLE_NAME + " ( " +
                 Contract.Todo.ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                Contract.Todo.NAME + " TEXT, " +
-                Contract.Todo.DESCRIPTION + " TEXT, " +
-                Contract.Todo.IS_DESCRIPTION_NULL + " INTEGER, " +
-                Contract.Todo.PRIORITY + " INTEGER, " +
-                Contract.Todo.DUE_TIME_IN_MILLIS + " INTEGER, " +
-                Contract.Todo.IS_COMPLETED + " INTEGER, " +
-                Contract.Todo.IS_TAGGED + " INTEGER, " +
-                Contract.Todo.IS_ALARMSET + " INTEGER )";
-        db.execSQL(expensesSql);
+                Contract.Todo.NAME + " TEXT NOT NULL, " +
+                Contract.Todo.DESCRIPTION + " TEXT DEFAULT '', " +
+                Contract.Todo.IS_DESCRIPTION_NULL + " INTEGER DEFAULT 0, " +
+                Contract.Todo.PRIORITY + " INTEGER DEFAULT 0, " +
+                Contract.Todo.DUE_TIME_IN_MILLIS + " INTEGER DEFAULT 0, " +
+                Contract.Todo.IS_COMPLETED + " INTEGER DEFAULT 0, " +
+                Contract.Todo.IS_TAGGED + " INTEGER DEFAULT 0, " +
+                Contract.Todo.IS_ALARMSET + " INTEGER DEFAULT 0 )";
+        db.execSQL(command);
 
-        expensesSql = "CREATE TABLE " + Contract.Tags.TABLE_NAME + " ( " +
+        command = "CREATE TABLE " + Contract.Tags.TABLE_NAME + " ( " +
                 Contract.Tags.ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                Contract.Tags.NAME + " TEXT )";
-        db.execSQL(expensesSql);
+                Contract.Tags.NAME + " TEXT NOT NULL )";
+        db.execSQL(command);
 
-        expensesSql = "CREATE TABLE " + Contract.TagsHolder.TABLE_NAME + " ( " +
+        command = "CREATE TABLE " + Contract.TagsHolder.TABLE_NAME + " ( " +
                 Contract.TagsHolder.ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 Contract.TagsHolder.ID_OF_TODO + " INTEGER, " +
-                Contract.TagsHolder.ID_OF_TAGS + " INTEGER) ";
-        db.execSQL(expensesSql);
+                Contract.TagsHolder.ID_OF_TAGS + " INTEGER, " +
+                "FOREIGN KEY (" + Contract.TagsHolder.ID_OF_TODO + ") " +
+                "REFERENCES " + Contract.Todo.TABLE_NAME + "(" + Contract.Todo.ID + "), " +
+                "FOREIGN KEY (" + Contract.TagsHolder.ID_OF_TAGS + ") " +
+                "REFERENCES " + Contract.Tags.TABLE_NAME + "(" + Contract.Tags.ID + ") ) ";
+        db.execSQL(command);
     }
 
     @Override

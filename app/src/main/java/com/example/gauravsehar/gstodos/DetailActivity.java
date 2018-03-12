@@ -18,6 +18,7 @@ import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -37,13 +38,13 @@ public class DetailActivity extends AppCompatActivity implements DatePickerDialo
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        //Activity Intent Finder
-        intentFinder();
-
         setContentView(R.layout.activity_detail);
 
         //Finding All UI Elements
         uiElementsFinder();
+
+        //Activity Intent Finder
+        intentFinder();
 
         //UI Elements Listener Setter
         uiElementsListenerSetter();
@@ -102,6 +103,7 @@ public class DetailActivity extends AppCompatActivity implements DatePickerDialo
 
     private void populateDataFromBundle() {
         int id = bundle.getInt(Constants.ID_KEY, -1);
+        Toast.makeText(DetailActivity.this, String.valueOf(id), Toast.LENGTH_LONG).show();
         if (id > 0) {
             TodoOpenHelper todoOpenHelper = TodoOpenHelper.getInstance(this);
             SQLiteDatabase sqLiteDatabase = todoOpenHelper.getReadableDatabase();
@@ -109,25 +111,25 @@ public class DetailActivity extends AppCompatActivity implements DatePickerDialo
             Cursor cursor = sqLiteDatabase.query(Contract.Todo.TABLE_NAME, null, Contract.Todo.ID + " = ?", selectionArgs, null, null, null);
             if (cursor.moveToFirst()) {
                 String name = cursor.getString(cursor.getColumnIndex(Contract.Todo.NAME));
-//                String desc = cursor.getString(cursor.getColumnIndex(Contract.Todo.DESCRIPTION));
-//                int priority = cursor.getInt(cursor.getColumnIndex(Contract.Todo.PRIORITY));
-//                long epochTime = cursor.getLong(cursor.getColumnIndex(Contract.Todo.DUE_TIME_IN_MILLIS));
-//                boolean done = Convert.intToBool(cursor.getInt(cursor.getColumnIndex(Contract.Todo.IS_COMPLETED)));
-//                boolean alarmset = Convert.intToBool(cursor.getInt(cursor.getColumnIndex(Contract.Todo.IS_ALARMSET)));
-//
-//                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MMM dd yyyy hh:mm a");
-//                Calendar calendar = Calendar.getInstance();
-//                calendar.setTimeInMillis(epochTime);
-//                String date = simpleDateFormat.format(calendar.getTime()).substring(0,11);
-//                String time = simpleDateFormat.format(calendar.getTime()).substring(12,20);
+                String desc = cursor.getString(cursor.getColumnIndex(Contract.Todo.DESCRIPTION));
+                int priority = cursor.getInt(cursor.getColumnIndex(Contract.Todo.PRIORITY));
+                long epochTime = cursor.getLong(cursor.getColumnIndex(Contract.Todo.DUE_TIME_IN_MILLIS));
+                boolean done = Convert.intToBool(cursor.getInt(cursor.getColumnIndex(Contract.Todo.IS_COMPLETED)));
+                boolean alarmset = Convert.intToBool(cursor.getInt(cursor.getColumnIndex(Contract.Todo.IS_ALARMSET)));
+
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MMM dd yyyy hh:mm a");
+                Calendar calendar = Calendar.getInstance();
+                calendar.setTimeInMillis(epochTime);
+                String date = simpleDateFormat.format(calendar.getTime()).substring(0, 11);
+                String time = simpleDateFormat.format(calendar.getTime()).substring(12, 20);
 
                 todoNameEditText.setText(name);
-//                todoDueDateTextView.setText(date);
-//                todoDueTimeTextView.setText(time);
-//                todoDoneCheckBox.setChecked(done);
-//                todoPrioritySpinner.setSelection(priority, true);
-//                todoDescriptionEditText.setText(desc);
-//                todoAlarmSwitch.setChecked(alarmset);
+                todoDueDateTextView.setText(date);
+                todoDueTimeTextView.setText(time);
+                todoDoneCheckBox.setChecked(done);
+                todoPrioritySpinner.setSelection(priority, true);
+                todoDescriptionEditText.setText(desc);
+                todoAlarmSwitch.setChecked(alarmset);
             }
             cursor.close();
         }

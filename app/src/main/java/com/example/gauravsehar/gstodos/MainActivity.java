@@ -1,27 +1,33 @@
 package com.example.gauravsehar.gstodos;
 
+import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.RadioButton;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
 
     ListView todoListView;
-    RadioButton addTodoDoneRadioButton;
+    RadioButton todoDoneRadioButton;
     EditText addTodoEditText;
     Button addTodoButton;
     FloatingActionButton fab;
@@ -38,6 +44,8 @@ public class MainActivity extends AppCompatActivity {
 
         //Finding All UI Elements
         uiElementsFinder();
+
+        todoOpenHelper = TodoOpenHelper.getInstance(this);
 
         //Setting Adapter on ListView
         listViewAdapterSetter();
@@ -59,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
     private void uiElementsFinder() {
         //Finding All UI Elements
         todoListView = findViewById(R.id.todoListView);
-        addTodoDoneRadioButton = findViewById(R.id.doneTodoRadioButton);
+        todoDoneRadioButton = findViewById(R.id.doneTodoRadioButton);
         addTodoEditText = findViewById(R.id.todoNameEditText);
         addTodoButton = findViewById(R.id.addTodoButton);
         fab = findViewById(R.id.fab);
@@ -67,21 +75,40 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void listViewAdapterSetter() {
-        todoOpenHelper = TodoOpenHelper.getInstance(this);
-        mTodos = Todo.getDummyTodo(15);
-//        mTodos = fetchTodosFromDB();
+//        todoOpenHelper = TodoOpenHelper.getInstance(this);
+//        mTodos = Todo.getDummyTodo(15);
+        mTodos = fetchTodosFromDB();
         mAdapter = new TodoAdapter(this, mTodos);
         todoListView.setAdapter(mAdapter);
+    }
+
+    private ArrayList<Todo> fetchTodosFromDB() {
+        ArrayList<Todo> todos = new ArrayList<>();
+        SQLiteDatabase sqLiteDatabase = todoOpenHelper.getReadableDatabase();
+        //todo columns optimizing
+        Cursor cursor = sqLiteDatabase.query(Contract.Todo.TABLE_NAME, null, null, null, null, null, null);
+        while (cursor.moveToNext()) {
+            int id = cursor.getInt(cursor.getColumnIndex(Contract.Todo.ID));
+            String name = cursor.getString(cursor.getColumnIndex(Contract.Todo.NAME));
+            int todoComplete = cursor.getInt(cursor.getColumnIndex(Contract.Todo.IS_COMPLETED));
+            int alarmset = cursor.getInt(cursor.getColumnIndex(Contract.Todo.IS_ALARMSET));
+            int description = cursor.getInt(cursor.getColumnIndex(Contract.Todo.IS_DESCRIPTION_NULL));
+            // todo garbage run
+            Todo todo = new Todo(id, name, null, Convert.intToBool(description), 0, 0, false, Convert.intToBool(todoComplete), Convert.intToBool(alarmset));
+            todos.add(todo);
+        }
+        cursor.close();
+        return todos;
     }
 
     private void toggleAddTodoField(boolean showAddTodoField) {
         if (showAddTodoField) {
             fab.setVisibility(View.GONE);
-            addTodoDoneRadioButton.setVisibility(View.VISIBLE);
+            todoDoneRadioButton.setVisibility(View.VISIBLE);
             addTodoEditText.setVisibility(View.VISIBLE);
             addTodoButton.setVisibility(View.VISIBLE);
         } else {
-            addTodoDoneRadioButton.setVisibility(View.GONE);
+            todoDoneRadioButton.setVisibility(View.GONE);
             addTodoEditText.setVisibility(View.GONE);
             addTodoButton.setVisibility(View.GONE);
             fab.setVisibility(View.VISIBLE);
@@ -93,19 +120,17 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, DetailActivity.class);
-                startActivityForResult(intent, Constants.ADD_TODO_REQUEST);
 
-//                //SETTING UP ADDING FACILITY
-//                toggleAddTodoField(true);
-//
-//                //REQUESTING KEYBOARD FOCUS
-//                addTodoEditText.requestFocus();
-//                InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(MainActivity.INPUT_METHOD_SERVICE);
-//                if (inputMethodManager != null) {
-//                    inputMethodManager.showSoftInput(addTodoEditText, InputMethodManager.SHOW_IMPLICIT);
-//                } else
-//                    Log.d("debugGS", "onClick: fabInputManager ERROR");
+                //SETTING UP ADDING FACILITY
+                toggleAddTodoField(true);
+
+                //REQUESTING KEYBOARD FOCUS
+                addTodoEditText.requestFocus();
+                InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(MainActivity.INPUT_METHOD_SERVICE);
+                if (inputMethodManager != null) {
+                    inputMethodManager.showSoftInput(addTodoEditText, InputMethodManager.SHOW_IMPLICIT);
+                } else
+                    Log.d("debugGS", "onClick: fabInputManager ERROR");
             }
         });
 
@@ -117,6 +142,7 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(MainActivity.this, DetailActivity.class);
                 Bundle bundle = new Bundle();
                 bundle.putInt(Constants.ID_KEY, (int) id);
+                intent.putExtras(bundle);
                 startActivityForResult(intent, Constants.DETAIL_ACTIVITY_REQUEST);
             }
         });
@@ -132,9 +158,9 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
 
-//                        SQLiteDatabase database = todoOpenHelper.getWritableDatabase();
-//                        String[] ids = {id + ""};
-//                        database.delete(Contract.Todo.TABLE_NAME, Contract.Todo.ID + " = ?", ids);
+                        SQLiteDatabase database = todoOpenHelper.getWritableDatabase();
+                        String[] ids = {id + ""};
+                        database.delete(Contract.Todo.TABLE_NAME, Contract.Todo.ID + " = ?", ids);
                         mTodos.remove(position);
                         mAdapter.notifyDataSetChanged();
                         dialog.dismiss();
@@ -149,6 +175,29 @@ public class MainActivity extends AppCompatActivity {
                 });
                 builder.show();
                 return true;
+            }
+        });
+
+        addTodoButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Todo todo = new Todo(addTodoEditText.getText().toString(), "", true, 0, 0, false, todoDoneRadioButton.isChecked(), false);
+                SQLiteDatabase sqLiteDatabase = todoOpenHelper.getWritableDatabase();
+                ContentValues contentValues = new ContentValues();
+                contentValues.put(Contract.Todo.NAME, addTodoEditText.getText().toString());
+                contentValues.put(Contract.Todo.DESCRIPTION, "");
+                contentValues.put(Contract.Todo.IS_DESCRIPTION_NULL, true);
+                contentValues.put(Contract.Todo.PRIORITY, 0);
+                contentValues.put(Contract.Todo.DUE_TIME_IN_MILLIS, 0);
+                contentValues.put(Contract.Todo.IS_COMPLETED, todoDoneRadioButton.isChecked());
+                contentValues.put(Contract.Todo.IS_TAGGED, false);
+                contentValues.put(Contract.Todo.IS_ALARMSET, false);
+                long id = sqLiteDatabase.insert(Contract.Todo.TABLE_NAME, null, contentValues);
+                todo.setId((int) id);
+                Toast.makeText(MainActivity.this, String.valueOf(id), Toast.LENGTH_LONG).show();
+                mTodos.add(todo);
+                Log.d("TAG", todo.getName());
+                mAdapter.notifyDataSetChanged();
             }
         });
     }

@@ -5,7 +5,7 @@ package com.example.gauravsehar.gstodos;
  */
 
 public class Contract {
-    public static final String DATABASE_NAME = "expenses_db";
+    public static final String DATABASE_NAME = "gstodos_db";
     public static final int VERSION = 1;
 
     static class Todo {
