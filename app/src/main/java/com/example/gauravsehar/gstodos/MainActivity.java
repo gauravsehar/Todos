@@ -45,8 +45,6 @@ public class MainActivity extends AppCompatActivity {
         //Finding All UI Elements
         uiElementsFinder();
 
-        todoOpenHelper = TodoOpenHelper.getInstance(this);
-
         //Setting Adapter on ListView
         listViewAdapterSetter();
 
@@ -75,7 +73,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void listViewAdapterSetter() {
-//        todoOpenHelper = TodoOpenHelper.getInstance(this);
+        todoOpenHelper = TodoOpenHelper.getInstance(this);
 //        mTodos = Todo.getDummyTodo(15);
         mTodos = fetchTodosFromDB();
         mAdapter = new TodoAdapter(this, mTodos);
@@ -126,11 +124,12 @@ public class MainActivity extends AppCompatActivity {
 
                 //REQUESTING KEYBOARD FOCUS
                 addTodoEditText.requestFocus();
-                InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(MainActivity.INPUT_METHOD_SERVICE);
-                if (inputMethodManager != null) {
-                    inputMethodManager.showSoftInput(addTodoEditText, InputMethodManager.SHOW_IMPLICIT);
-                } else
-                    Log.d("debugGS", "onClick: fabInputManager ERROR");
+                showSoftKeyboard(addTodoEditText);
+//                InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(MainActivity.INPUT_METHOD_SERVICE);
+//                if (inputMethodManager != null) {
+//                    inputMethodManager.showSoftInput(addTodoEditText, InputMethodManager.SHOW_IMPLICIT);
+//                } else
+//                    Log.d("debugGS", "onClick: fabInputManager ERROR");
             }
         });
 
@@ -198,8 +197,41 @@ public class MainActivity extends AppCompatActivity {
                 mTodos.add(todo);
                 Log.d("TAG", todo.getName());
                 mAdapter.notifyDataSetChanged();
+                addTodoEditText.setText("");
+                todoDoneRadioButton.setChecked(false);
             }
         });
+    }
+
+    public void showSoftKeyboard(View view) {
+        view.requestFocus();
+        InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+        if (inputMethodManager != null) {
+            inputMethodManager.showSoftInput(view, 0);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (data != null) {
+            Bundle bundle = data.getExtras();
+            switch (requestCode) {
+                case Constants.DETAIL_ACTIVITY_REQUEST:
+                    if (resultCode == Constants.SAVE_SUCCESS_RESULT) {
+                        mAdapter.notifyDataSetChanged();
+//                        if (bundle != null) {
+//                            int position = bundle.getInt(Constants.LISTVIEW_POSITION_KEY, -1);
+//                            if (position >= 0) {
+//                                Todo todo = getTodoFr(bundle);
+//                                mExpenses.set(position,expense);
+//                                mAdapter.notifyDataSetChanged();
+//                            }
+//                        }
+                    }
+                    break;
+            }
+        }
     }
 
     @Override

@@ -2,6 +2,7 @@ package com.example.gauravsehar.gstodos;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -10,6 +11,7 @@ import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.DatePicker;
@@ -21,6 +23,7 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -33,6 +36,11 @@ public class DetailActivity extends AppCompatActivity implements DatePickerDialo
     Spinner todoPrioritySpinner;
     Switch todoAlarmSwitch;
     Bundle bundle;
+    TodoOpenHelper todoOpenHelper;
+
+    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MMM dd yyyy hh:mm a");
+
+    int id;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,18 +99,22 @@ public class DetailActivity extends AppCompatActivity implements DatePickerDialo
         todoDoneCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if (isChecked)
-                    todoNameEditText.setPaintFlags(todoNameEditText.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
-                else
-                    todoNameEditText.setPaintFlags(todoNameEditText.getPaintFlags() & ~Paint.STRIKE_THRU_TEXT_FLAG);
+                todoNameStrikeout(isChecked);
             }
         });
 
 
     }
 
+    private void todoNameStrikeout(boolean setStrikeoutText) {
+        if (setStrikeoutText)
+            todoNameEditText.setPaintFlags(todoNameEditText.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+        else
+            todoNameEditText.setPaintFlags(todoNameEditText.getPaintFlags() & ~Paint.STRIKE_THRU_TEXT_FLAG);
+    }
+
     private void populateDataFromBundle() {
-        int id = bundle.getInt(Constants.ID_KEY, -1);
+        id = bundle.getInt(Constants.ID_KEY, -1);
         Toast.makeText(DetailActivity.this, String.valueOf(id), Toast.LENGTH_LONG).show();
         if (id > 0) {
             TodoOpenHelper todoOpenHelper = TodoOpenHelper.getInstance(this);
@@ -115,25 +127,38 @@ public class DetailActivity extends AppCompatActivity implements DatePickerDialo
                 int priority = cursor.getInt(cursor.getColumnIndex(Contract.Todo.PRIORITY));
                 long epochTime = cursor.getLong(cursor.getColumnIndex(Contract.Todo.DUE_TIME_IN_MILLIS));
                 boolean done = Convert.intToBool(cursor.getInt(cursor.getColumnIndex(Contract.Todo.IS_COMPLETED)));
-                boolean alarmset = Convert.intToBool(cursor.getInt(cursor.getColumnIndex(Contract.Todo.IS_ALARMSET)));
+                boolean alarmSet = Convert.intToBool(cursor.getInt(cursor.getColumnIndex(Contract.Todo.IS_ALARMSET)));
 
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MMM dd yyyy hh:mm a");
                 Calendar calendar = Calendar.getInstance();
                 calendar.setTimeInMillis(epochTime);
                 String date = simpleDateFormat.format(calendar.getTime()).substring(0, 11);
                 String time = simpleDateFormat.format(calendar.getTime()).substring(12, 20);
 
+                if (done)
+                    todoNameStrikeout(true);
                 todoNameEditText.setText(name);
-                todoDueDateTextView.setText(date);
-                todoDueTimeTextView.setText(time);
+                if (epochTime != 0) {
+                    todoDueDateTextView.setText(date);
+                    todoDueTimeTextView.setText(time);
+                }
                 todoDoneCheckBox.setChecked(done);
                 todoPrioritySpinner.setSelection(priority, true);
                 todoDescriptionEditText.setText(desc);
-                todoAlarmSwitch.setChecked(alarmset);
+                todoAlarmSwitch.setChecked(alarmSet);
             }
             cursor.close();
         }
     }
+
+    public void hideSoftKeyboard() {
+        if (getCurrentFocus() != null) {
+            InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+            if (inputMethodManager != null) {
+                inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+            }
+        }
+    }
+
 
     @Override
     public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
@@ -159,5 +184,48 @@ public class DetailActivity extends AppCompatActivity implements DatePickerDialo
         String formattedMinute = String.format("%02d", minute);
         String displayString = newHour + ":" + formattedMinute + " " + AM_PM;
         todoDueTimeTextView.setText(displayString);
+    }
+
+    private long dateTimeInMillis() {
+        String dateTime = todoDueDateTextView.getText().toString() +
+                " " + todoDueTimeTextView.getText().toString();
+        Date date = null;
+        try {
+            date = simpleDateFormat.parse(dateTime);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            Toast.makeText(DetailActivity.this, "dateTimeInMillis Parsing Error.", Toast.LENGTH_LONG).show();
+        }
+        return date.getTime();
+    }
+
+    @Override
+    public void onBackPressed() {
+//        Todo todo = new Todo(addTodoEditText.getText().toString(), "", true, 0, 0, false, todoDoneRadioButton.isChecked(), false);
+        id = bundle.getInt(Constants.ID_KEY, -1);
+        todoOpenHelper = TodoOpenHelper.getInstance(this);
+        SQLiteDatabase sqLiteDatabase = todoOpenHelper.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(Contract.Todo.NAME, todoNameEditText.getText().toString());
+        contentValues.put(Contract.Todo.DESCRIPTION, todoDescriptionEditText.getText().toString());
+
+        contentValues.put(Contract.Todo.PRIORITY, todoPrioritySpinner.getSelectedItemPosition());
+
+        contentValues.put(Contract.Todo.IS_COMPLETED, todoDoneCheckBox.isChecked());
+        contentValues.put(Contract.Todo.IS_TAGGED, false);
+        contentValues.put(Contract.Todo.IS_ALARMSET, todoAlarmSwitch.isChecked());
+
+        if (todoDescriptionEditText.getText().toString().matches(""))
+            contentValues.put(Contract.Todo.IS_DESCRIPTION_NULL, true);
+        else
+            contentValues.put(Contract.Todo.IS_DESCRIPTION_NULL, false);
+
+        contentValues.put(Contract.Todo.DUE_TIME_IN_MILLIS, dateTimeInMillis());
+        String ids[] = {id + ""};
+        long id = sqLiteDatabase.update(Contract.Todo.TABLE_NAME, contentValues, Contract.Todo.ID + " = ? ", ids);
+//        todo.setId((int) id);
+        Toast.makeText(DetailActivity.this, String.valueOf(id), Toast.LENGTH_LONG).show();
+        setResult(Constants.SAVE_SUCCESS_RESULT);
+        super.onBackPressed();
     }
 }

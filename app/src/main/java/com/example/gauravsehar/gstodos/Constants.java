@@ -5,10 +5,6 @@ package com.example.gauravsehar.gstodos;
  */
 
 public class Constants {
-    //    public Todo(int id, String name,
-// String description,boolean nullDescription,
-// int priority, long dueTimeInMillis, boolean isTagged,
-// boolean isCompleted, boolean isAlarmSet)
     final static String ID_KEY = "id";
     final static String NAME_KEY = "name";
     final static String DESCRIPTION_KEY = "description";
@@ -17,7 +13,8 @@ public class Constants {
     final static String DUE_TIME_MILLIS_KEY = "epochTime";
     final static String IS_TAGGED_KEY = "tagged";
     final static String IS_COMPLETED_KEY = "completed";
-    final static String IS_ALARMSET_KEY = "alarm";
+
+    final static String LISTVIEW_POSITION_KEY = "position";
 
     final static String DETAIL_ACTIVITY = "detail_Activity";
     final static int DETAIL_ACTIVITY_REQUEST = 100;

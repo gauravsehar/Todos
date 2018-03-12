@@ -24,7 +24,7 @@ public class TodoOpenHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String command = "CREATE TABLE " + Contract.Todo.TABLE_NAME + " ( " +
+        String query = "CREATE TABLE " + Contract.Todo.TABLE_NAME + " ( " +
                 Contract.Todo.ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 Contract.Todo.NAME + " TEXT NOT NULL, " +
                 Contract.Todo.DESCRIPTION + " TEXT DEFAULT '', " +
@@ -34,14 +34,14 @@ public class TodoOpenHelper extends SQLiteOpenHelper {
                 Contract.Todo.IS_COMPLETED + " INTEGER DEFAULT 0, " +
                 Contract.Todo.IS_TAGGED + " INTEGER DEFAULT 0, " +
                 Contract.Todo.IS_ALARMSET + " INTEGER DEFAULT 0 )";
-        db.execSQL(command);
+        db.execSQL(query);
 
-        command = "CREATE TABLE " + Contract.Tags.TABLE_NAME + " ( " +
+        query = "CREATE TABLE " + Contract.Tags.TABLE_NAME + " ( " +
                 Contract.Tags.ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 Contract.Tags.NAME + " TEXT NOT NULL )";
-        db.execSQL(command);
+        db.execSQL(query);
 
-        command = "CREATE TABLE " + Contract.TagsHolder.TABLE_NAME + " ( " +
+        query = "CREATE TABLE " + Contract.TagsHolder.TABLE_NAME + " ( " +
                 Contract.TagsHolder.ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 Contract.TagsHolder.ID_OF_TODO + " INTEGER, " +
                 Contract.TagsHolder.ID_OF_TAGS + " INTEGER, " +
@@ -49,7 +49,7 @@ public class TodoOpenHelper extends SQLiteOpenHelper {
                 "REFERENCES " + Contract.Todo.TABLE_NAME + "(" + Contract.Todo.ID + "), " +
                 "FOREIGN KEY (" + Contract.TagsHolder.ID_OF_TAGS + ") " +
                 "REFERENCES " + Contract.Tags.TABLE_NAME + "(" + Contract.Tags.ID + ") ) ";
-        db.execSQL(command);
+        db.execSQL(query);
     }
 
     @Override
