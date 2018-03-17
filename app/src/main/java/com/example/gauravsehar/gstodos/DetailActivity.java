@@ -1,6 +1,8 @@
 package com.example.gauravsehar.gstodos;
 
+import android.app.AlarmManager;
 import android.app.DatePickerDialog;
+import android.app.PendingIntent;
 import android.app.TimePickerDialog;
 import android.content.ContentValues;
 import android.content.Intent;
@@ -63,7 +65,7 @@ public class DetailActivity extends AppCompatActivity implements DatePickerDialo
         bundle = intent.getExtras();
         //If Bundle Find Display Bundle Values
         if (bundle != null)
-            populateDataFromBundle();
+            populateDataFromDB();
         else
             bundle = new Bundle();
     }
@@ -102,8 +104,6 @@ public class DetailActivity extends AppCompatActivity implements DatePickerDialo
                 todoNameStrikeout(isChecked);
             }
         });
-
-
     }
 
     private void todoNameStrikeout(boolean setStrikeoutText) {
@@ -113,7 +113,7 @@ public class DetailActivity extends AppCompatActivity implements DatePickerDialo
             todoNameEditText.setPaintFlags(todoNameEditText.getPaintFlags() & ~Paint.STRIKE_THRU_TEXT_FLAG);
     }
 
-    private void populateDataFromBundle() {
+    private void populateDataFromDB() {
         id = bundle.getInt(Constants.ID_KEY, -1);
         Toast.makeText(DetailActivity.this, String.valueOf(id), Toast.LENGTH_LONG).show();
         if (id > 0) {
@@ -196,13 +196,24 @@ public class DetailActivity extends AppCompatActivity implements DatePickerDialo
             e.printStackTrace();
             Toast.makeText(DetailActivity.this, "dateTimeInMillis Parsing Error.", Toast.LENGTH_LONG).show();
         }
-        return date.getTime();
+        return date != null ? date.getTime() : 0;
     }
 
     @Override
     public void onBackPressed() {
-//        Todo todo = new Todo(addTodoEditText.getText().toString(), "", true, 0, 0, false, todoDoneRadioButton.isChecked(), false);
+//        +odo +odo = new +odo(addTodoEditText.getText().toString(), "", true, 0, 0, false, todoDoneRadioButton.isChecked(), false);
         id = bundle.getInt(Constants.ID_KEY, -1);
+
+        if (todoAlarmSwitch.isChecked()) {
+            AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+            Intent intent = new Intent(DetailActivity.this, AlarmReceiver.class);
+            intent.putExtra(Constants.NOTIFICATION_KEY, Constants.NOTIFICATION_CHANNEL_KEY);
+            intent.putExtra(Constants.NAME_KEY, todoNameEditText.getText().toString());
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(DetailActivity.this, 1, intent, 0);
+            Toast.makeText(DetailActivity.this, String.valueOf(dateTimeInMillis()), Toast.LENGTH_LONG).show();
+            alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, dateTimeInMillis(), 60000, pendingIntent);
+        }
+
         todoOpenHelper = TodoOpenHelper.getInstance(this);
         SQLiteDatabase sqLiteDatabase = todoOpenHelper.getWritableDatabase();
         ContentValues contentValues = new ContentValues();

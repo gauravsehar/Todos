@@ -13,6 +13,8 @@ public class Constants {
     final static String DUE_TIME_MILLIS_KEY = "epochTime";
     final static String IS_TAGGED_KEY = "tagged";
     final static String IS_COMPLETED_KEY = "completed";
+    final static String NOTIFICATION_KEY = "notification";
+    final static String NOTIFICATION_CHANNEL_KEY = "notificationChannel";
 
     final static String LISTVIEW_POSITION_KEY = "position";
 

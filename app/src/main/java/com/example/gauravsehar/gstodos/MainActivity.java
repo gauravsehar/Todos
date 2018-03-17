@@ -17,9 +17,9 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.RadioButton;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -27,7 +27,7 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity {
 
     ListView todoListView;
-    RadioButton todoDoneRadioButton;
+    CheckBox todoDoneCheckBox;
     EditText addTodoEditText;
     Button addTodoButton;
     FloatingActionButton fab;
@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
     private void uiElementsFinder() {
         //Finding All UI Elements
         todoListView = findViewById(R.id.todoListView);
-        todoDoneRadioButton = findViewById(R.id.doneTodoRadioButton);
+        todoDoneCheckBox = findViewById(R.id.doneTodoCheckBox);
         addTodoEditText = findViewById(R.id.todoNameEditText);
         addTodoButton = findViewById(R.id.addTodoButton);
         fab = findViewById(R.id.fab);
@@ -102,11 +102,11 @@ public class MainActivity extends AppCompatActivity {
     private void toggleAddTodoField(boolean showAddTodoField) {
         if (showAddTodoField) {
             fab.setVisibility(View.GONE);
-            todoDoneRadioButton.setVisibility(View.VISIBLE);
+            todoDoneCheckBox.setVisibility(View.VISIBLE);
             addTodoEditText.setVisibility(View.VISIBLE);
             addTodoButton.setVisibility(View.VISIBLE);
         } else {
-            todoDoneRadioButton.setVisibility(View.GONE);
+            todoDoneCheckBox.setVisibility(View.GONE);
             addTodoEditText.setVisibility(View.GONE);
             addTodoButton.setVisibility(View.GONE);
             fab.setVisibility(View.VISIBLE);
@@ -180,7 +180,7 @@ public class MainActivity extends AppCompatActivity {
         addTodoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Todo todo = new Todo(addTodoEditText.getText().toString(), "", true, 0, 0, false, todoDoneRadioButton.isChecked(), false);
+                Todo todo = new Todo(addTodoEditText.getText().toString(), "", true, 0, 0, false, todoDoneCheckBox.isChecked(), false);
                 SQLiteDatabase sqLiteDatabase = todoOpenHelper.getWritableDatabase();
                 ContentValues contentValues = new ContentValues();
                 contentValues.put(Contract.Todo.NAME, addTodoEditText.getText().toString());
@@ -188,7 +188,7 @@ public class MainActivity extends AppCompatActivity {
                 contentValues.put(Contract.Todo.IS_DESCRIPTION_NULL, true);
                 contentValues.put(Contract.Todo.PRIORITY, 0);
                 contentValues.put(Contract.Todo.DUE_TIME_IN_MILLIS, 0);
-                contentValues.put(Contract.Todo.IS_COMPLETED, todoDoneRadioButton.isChecked());
+                contentValues.put(Contract.Todo.IS_COMPLETED, todoDoneCheckBox.isChecked());
                 contentValues.put(Contract.Todo.IS_TAGGED, false);
                 contentValues.put(Contract.Todo.IS_ALARMSET, false);
                 long id = sqLiteDatabase.insert(Contract.Todo.TABLE_NAME, null, contentValues);
@@ -198,7 +198,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.d("TAG", todo.getName());
                 mAdapter.notifyDataSetChanged();
                 addTodoEditText.setText("");
-                todoDoneRadioButton.setChecked(false);
+                todoDoneCheckBox.setChecked(false);
             }
         });
     }
@@ -215,7 +215,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (data != null) {
-            Bundle bundle = data.getExtras();
+//            Bundle bundle = data.getExtras();
             switch (requestCode) {
                 case Constants.DETAIL_ACTIVITY_REQUEST:
                     if (resultCode == Constants.SAVE_SUCCESS_RESULT) {

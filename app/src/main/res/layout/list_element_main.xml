@@ -6,8 +6,8 @@
     android:descendantFocusability="blocksDescendants"
     android:orientation="horizontal">
 
-    <RadioButton
-        android:id="@+id/todoDoneRadioButton"
+    <CheckBox
+        android:id="@+id/todoDoneCheckBox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignBottom="@+id/contentLinearLayout"
@@ -20,7 +20,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_alignParentTop="true"
-        android:layout_toEndOf="@id/todoDoneRadioButton"
+        android:layout_toEndOf="@id/todoDoneCheckBox"
         android:orientation="vertical">
 
         <TextView
